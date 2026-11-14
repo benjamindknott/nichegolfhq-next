@@ -6,7 +6,7 @@ import { midAmBoardIndex, midAmScoreFor, seniorBoardIndex, seniorScoreFor, unuse
 import { EWING_EVENT_SLUG } from "./ewing-event";
 
 /** When the public site was checked for a scoring link. Not the field-sheet time. */
-const SCORING_CHECKED_AT = "2026-11-13T15:40:00-06:00";
+const SCORING_CHECKED_AT = "2026-11-14T14:55:00-06:00";
 
 export { EWING_EVENT_SLUG };
 
@@ -57,7 +57,9 @@ export const EWING_SNAPSHOT = {
     { url: "https://www.ewingcup.com/leaderboard", title: "Guessed leaderboard path", outcome: "not_found" },
     { url: "https://www.golfgenius.com/pages/12440584375098158373", title: "Golf Genius tournament results", outcome: "loaded" },
     { url: "https://www.golfgenius.com/v2tournaments/12440584571592912099?called_from=widgets%2Ftournament_results&player_stats_for_portal=true&round_index=1", title: "Golf Genius mid-amateur round 1 results", outcome: "loaded" },
+    { url: "https://www.golfgenius.com/v2tournaments/12440584571592912099?called_from=widgets%2Ftournament_results&player_stats_for_portal=true&round_index=2", title: "Golf Genius mid-amateur round 2 results", outcome: "loaded" },
     { url: "https://www.golfgenius.com/v2tournaments/13232099867553181053?called_from=widgets%2Ftournament_results&player_stats_for_portal=true&round_index=1", title: "Golf Genius senior round 1 results", outcome: "loaded" },
+    { url: "https://www.golfgenius.com/v2tournaments/13232099867553181053?called_from=widgets%2Ftournament_results&player_stats_for_portal=true&round_index=2", title: "Golf Genius senior round 2 results", outcome: "loaded" },
   ] satisfies SourceRead[],
   missingInput: [],
   rounds: [
@@ -75,7 +77,7 @@ export const EWING_SNAPSHOT = {
       label: "Saturday",
       date: "2026-11-14",
       course: "Gold Course",
-      detail: "Round 2. Tee times were still TBD on the official schedule.",
+      detail: "Round 2 on the Gold Course.",
       publicLine: null,
       par: 72,
     },

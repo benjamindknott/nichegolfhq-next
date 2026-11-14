@@ -145,25 +145,35 @@ for (const team of midAm) {
   if (!score || score.rounds[0]?.status !== "complete" || score.rounds[0].strokes == null) {
     throw new Error(`${team.names.join(" + ")} is missing a completed round 1`);
   }
-  if (score.rounds[1]?.status !== "not_posted" || score.rounds[1].strokes != null) {
-    throw new Error(`${team.names.join(" + ")} has a posted round 2 before that round was played`);
+  if (score.rounds[1]?.status !== "complete" || score.rounds[1].strokes == null) {
+    throw new Error(`${team.names.join(" + ")} is missing a completed round 2`);
   }
   if (score.rounds[2]?.status !== "not_posted" || score.rounds[2].strokes != null) {
     throw new Error(`${team.names.join(" + ")} has a posted final round before that round was played`);
   }
-  if (score.total !== score.rounds[0].strokes) throw new Error(`${team.names.join(" + ")} total does not match round 1`);
+  if (score.total !== score.rounds[0].strokes + score.rounds[1].strokes) {
+    throw new Error(`${team.names.join(" + ")} total does not match rounds 1 and 2`);
+  }
 }
 const midAmBoard = standings(midAm, "mid-am");
-if (midAmBoard[0]?.names.join(" + ") !== "Robbie Keyes + Michael Sass") throw new Error("Round 1 leader was not first");
-if (midAmBoard[0]?.position !== "1" || midAmBoard[0].rankNote !== "official") throw new Error("Round 1 leader place was not official");
+if (midAmBoard[0]?.names.join(" + ") !== "Robbie Keyes + Michael Sass") throw new Error("Round 2 leader was not first");
+if (midAmBoard[0]?.position !== "1" || midAmBoard[0].rankNote !== "official") throw new Error("Round 2 leader place was not official");
+if (midAmBoard[0]?.score?.total !== 132 || midAmBoard[0]?.score?.toPar !== -12) throw new Error("Round 2 leader total was not 132, -12");
+if (midAmBoard[0]?.score?.rounds[1]?.strokes !== 70) throw new Error("Round 2 leader gold-course score was not 70");
 if (midAmBoard.some((row) => row.rankNote !== "official" || !row.position)) throw new Error("A mid-am team was missing its official place");
-if (midAmBoard.at(-1)?.names.join(" + ") !== "Marcus Jones + Tate Oakley" || midAmBoard.at(-1)?.position !== "32") {
-  throw new Error("Round 1 last place was not 32nd");
+if (midAmBoard.at(-1)?.names.join(" + ") !== "Colby Amparan + Gary Ezmerlian" || midAmBoard.at(-1)?.position !== "32") {
+  throw new Error("Round 2 last place was not 32nd");
 }
-if (midAmBoard.map((row) => row.position).join(",") !== "1,2,T3,T3,5,T6,T6,T6,T9,T9,T9,T9,T9,T14,T14,T14,T14,T18,T18,T18,T18,T18,T23,T23,T23,T26,T26,28,T29,T29,T29,32") {
-  throw new Error("Round 1 official place order changed");
+if (midAmBoard.at(-1)?.score?.total !== 151) throw new Error("Round 2 last place total was not 151");
+if (midAmBoard.map((row) => row.position).join(",") !== "1,T2,T2,T4,T4,T4,T7,T7,T7,T10,T10,T10,T10,T14,T14,T14,T17,T17,T17,T17,T17,22,T23,T23,T25,T25,T25,T28,T28,T30,T30,32") {
+  throw new Error("Round 2 official place order changed");
 }
-if (midAmBoard[5]?.names.join(" + ") !== "Jonathan Keane + Andrew Grice") throw new Error("T6 official order should start with Keane and Grice");
+if (midAmBoard.find((row) => row.names.join(" + ") === "Jonathan Keane + Andrew Grice")?.position !== "T14") {
+  throw new Error("Keane and Grice should be T14 after round 2");
+}
+if (midAmBoard.find((row) => row.names.join(" + ") === "Ryan Munson + Daniel Mitchell")?.position !== "T7") {
+  throw new Error("Munson and Mitchell should be T7 after round 2");
+}
 
 const senior = EWING_SNAPSHOT.teams.filter((team) => team.division === "senior");
 if (senior.length !== 20) throw new Error(`Expected 20 senior teams, got ${senior.length}`);
