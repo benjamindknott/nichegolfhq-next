@@ -3096,6 +3096,20 @@ export const MIDAM_TOURNAMENTS: Tournament[] = [
     ],
     news: [
       {
+        slug: "2026-ewing-cup-four-ball-round-2-recap",
+        title: "Keyes and Sass Go Bogey-Free on the Gold Course to Lead the Ewing Cup Four-Ball by Five",
+        date: "2026-11-14",
+        author: "midamgolfHQ Staff",
+        summary:
+          "Keyes and Sass shot a bogey-free 2-under 70 on the Gold Course, a cold and windy day with greens running 13.5, to reach 12-under 132 and lead the Ewing Cup Four-Ball by five shots.",
+        content: [
+          "Robbie Keyes and Michael Sass shot a bogey-free 2-under 70 on the Gold Course at Dallas Athletic Club on Saturday, a cold and windy day with greens running 13.5, to reach 12-under 132. They lead the Ewing Cup Four-Ball by five shots heading into Sunday's final round.",
+          "Michael Randle and Zac Verses, one back after Friday, posted a 2-over 74 and are tied for second at 7-under 137 with Kenny Cook and Sean Rowen, who added an even-par 72. Michael Samp and Scott Kraul moved into a tie for fourth with a 4-under 68, joining Kolton Crawford and Sean Heidrick (70) and Michael Dwyer and Sam Jenkins (73) at 6-under 138.",
+          "Ryan Munson and Daniel Mitchell posted the low round of the day, a 6-under 66, to climb into a tie for seventh at 5-under 139. Defending champions James Minahan and Charlie Holland are in that group after a 1-under 71, along with Zach Atkinson and Brian Hatter. Jonathan Keane and Andrew Grice are tied for 14th at 3-under 141 after a 2-over 74.",
+          "The field returns to the Blue Course on Sunday for the final 18, with a full-field start at 8:30 AM. Follow live scoring on the [Ewing Cup hub](https://www.nichegolfhq.com/midamgolfhq/ewing-cup-four-ball).",
+        ],
+      },
+      {
         slug: "2026-ewing-cup-four-ball-round-1-recap",
         title: "Keyes and Sass Post 62, Eagle the 8th to Lead the Ewing Cup Four-Ball",
         date: "2026-11-13",
