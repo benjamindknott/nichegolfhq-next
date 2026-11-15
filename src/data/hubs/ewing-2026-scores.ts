@@ -11,43 +11,45 @@ export type MidAmScoreEntry = {
   pair: string;
   officialPosition: string;
   rounds: [number | null, number | null, number | null];
-  total: number;
-  toPar: number;
+  /** 0-based index of a withdrawn round. Strokes stay null; do not fill with zero. */
+  withdrawnRound?: 0 | 1 | 2;
+  total: number | null;
+  toPar: number | null;
 };
 
 export const EWING_2026_MIDAM_SCORES: MidAmScoreEntry[] = [
-  { pair: "Keyes + Sass", officialPosition: "1", rounds: [62, 70, null], total: 132, toPar: -12 },
-  { pair: "Randle + Verses", officialPosition: "T2", rounds: [63, 74, null], total: 137, toPar: -7 },
-  { pair: "Cook + Rowen", officialPosition: "T2", rounds: [65, 72, null], total: 137, toPar: -7 },
-  { pair: "Samp + Kraul", officialPosition: "T4", rounds: [70, 68, null], total: 138, toPar: -6 },
-  { pair: "Crawford + Heidrick", officialPosition: "T4", rounds: [68, 70, null], total: 138, toPar: -6 },
-  { pair: "Dwyer + Jenkins", officialPosition: "T4", rounds: [65, 73, null], total: 138, toPar: -6 },
-  { pair: "Munson + Mitchell", officialPosition: "T7", rounds: [73, 66, null], total: 139, toPar: -5 },
-  { pair: "Atkinson + Hatter", officialPosition: "T7", rounds: [66, 73, null], total: 139, toPar: -5 },
-  { pair: "Minahan + Holland", officialPosition: "T7", rounds: [68, 71, null], total: 139, toPar: -5 },
-  { pair: "Smith + Dickerson", officialPosition: "T10", rounds: [68, 72, null], total: 140, toPar: -4 },
-  { pair: "Zamorano + McCarroll", officialPosition: "T10", rounds: [67, 73, null], total: 140, toPar: -4 },
-  { pair: "Pagnam + Baxter", officialPosition: "T10", rounds: [69, 71, null], total: 140, toPar: -4 },
-  { pair: "Russell + Stollenwerck", officialPosition: "T10", rounds: [70, 70, null], total: 140, toPar: -4 },
-  { pair: "Morley-Stockton + Wilkins", officialPosition: "T14", rounds: [70, 71, null], total: 141, toPar: -3 },
-  { pair: "Woolf + Vinar", officialPosition: "T14", rounds: [67, 74, null], total: 141, toPar: -3 },
-  { pair: "Keane + Grice", officialPosition: "T14", rounds: [67, 74, null], total: 141, toPar: -3 },
-  { pair: "Paterson + Chung", officialPosition: "T17", rounds: [70, 72, null], total: 142, toPar: -2 },
-  { pair: "Collier + Hudelson", officialPosition: "T17", rounds: [71, 71, null], total: 142, toPar: -2 },
-  { pair: "Winslett + McDonald", officialPosition: "T17", rounds: [68, 74, null], total: 142, toPar: -2 },
-  { pair: "Black + Kirkpatrick", officialPosition: "T17", rounds: [69, 73, null], total: 142, toPar: -2 },
-  { pair: "Christiansen + Minton", officialPosition: "T17", rounds: [68, 74, null], total: 142, toPar: -2 },
-  { pair: "Noble + Vance", officialPosition: "22", rounds: [71, 72, null], total: 143, toPar: -1 },
-  { pair: "Elkington + Tracy", officialPosition: "T23", rounds: [75, 69, null], total: 144, toPar: 0 },
-  { pair: "Fleenor + Johnson", officialPosition: "T23", rounds: [69, 75, null], total: 144, toPar: 0 },
-  { pair: "DePasquale + Sandefur", officialPosition: "T25", rounds: [69, 76, null], total: 145, toPar: 1 },
-  { pair: "Govender + Adams", officialPosition: "T25", rounds: [70, 75, null], total: 145, toPar: 1 },
-  { pair: "Comerford + Lewis", officialPosition: "T25", rounds: [71, 74, null], total: 145, toPar: 1 },
-  { pair: "Espon + Kendrick", officialPosition: "T28", rounds: [72, 75, null], total: 147, toPar: 3 },
-  { pair: "Palmer + Holtgrieve", officialPosition: "T28", rounds: [72, 75, null], total: 147, toPar: 3 },
-  { pair: "Jones + Oakley", officialPosition: "T30", rounds: [76, 73, null], total: 149, toPar: 5 },
-  { pair: "Roudebush + Gutesha", officialPosition: "T30", rounds: [75, 74, null], total: 149, toPar: 5 },
-  { pair: "Amparan + Ezmerlian", officialPosition: "32", rounds: [75, 76, null], total: 151, toPar: 7 },
+  { pair: "Keyes + Sass", officialPosition: "1", rounds: [62, 70, 66], total: 198, toPar: -18 },
+  { pair: "Randle + Verses", officialPosition: "2", rounds: [63, 74, 68], total: 205, toPar: -11 },
+  { pair: "Crawford + Heidrick", officialPosition: "T3", rounds: [68, 70, 68], total: 206, toPar: -10 },
+  { pair: "Zamorano + McCarroll", officialPosition: "T3", rounds: [67, 73, 66], total: 206, toPar: -10 },
+  { pair: "Paterson + Chung", officialPosition: "T5", rounds: [70, 72, 65], total: 207, toPar: -9 },
+  { pair: "Cook + Rowen", officialPosition: "T5", rounds: [65, 72, 70], total: 207, toPar: -9 },
+  { pair: "Atkinson + Hatter", officialPosition: "T7", rounds: [66, 73, 69], total: 208, toPar: -8 },
+  { pair: "Collier + Hudelson", officialPosition: "T7", rounds: [71, 71, 66], total: 208, toPar: -8 },
+  { pair: "Winslett + McDonald", officialPosition: "T7", rounds: [68, 74, 66], total: 208, toPar: -8 },
+  { pair: "Dwyer + Jenkins", officialPosition: "T10", rounds: [65, 73, 72], total: 210, toPar: -6 },
+  { pair: "Smith + Dickerson", officialPosition: "T10", rounds: [68, 72, 70], total: 210, toPar: -6 },
+  { pair: "Pagnam + Baxter", officialPosition: "T10", rounds: [69, 71, 70], total: 210, toPar: -6 },
+  { pair: "Morley-Stockton + Wilkins", officialPosition: "T10", rounds: [70, 71, 69], total: 210, toPar: -6 },
+  { pair: "Black + Kirkpatrick", officialPosition: "T10", rounds: [69, 73, 68], total: 210, toPar: -6 },
+  { pair: "Russell + Stollenwerck", officialPosition: "T15", rounds: [70, 70, 71], total: 211, toPar: -5 },
+  { pair: "Woolf + Vinar", officialPosition: "T15", rounds: [67, 74, 70], total: 211, toPar: -5 },
+  { pair: "Fleenor + Johnson", officialPosition: "T15", rounds: [69, 75, 67], total: 211, toPar: -5 },
+  { pair: "Minahan + Holland", officialPosition: "T18", rounds: [68, 71, 73], total: 212, toPar: -4 },
+  { pair: "Govender + Adams", officialPosition: "T18", rounds: [70, 75, 67], total: 212, toPar: -4 },
+  { pair: "Samp + Kraul", officialPosition: "T18", rounds: [70, 68, 74], total: 212, toPar: -4 },
+  { pair: "Munson + Mitchell", officialPosition: "T21", rounds: [73, 66, 74], total: 213, toPar: -3 },
+  { pair: "Christiansen + Minton", officialPosition: "T21", rounds: [68, 74, 71], total: 213, toPar: -3 },
+  { pair: "Keane + Grice", officialPosition: "T23", rounds: [67, 74, 73], total: 214, toPar: -2 },
+  { pair: "Palmer + Holtgrieve", officialPosition: "T23", rounds: [72, 75, 67], total: 214, toPar: -2 },
+  { pair: "Comerford + Lewis", officialPosition: "25", rounds: [71, 74, 70], total: 215, toPar: -1 },
+  { pair: "DePasquale + Sandefur", officialPosition: "26", rounds: [69, 76, 71], total: 216, toPar: 0 },
+  { pair: "Noble + Vance", officialPosition: "T27", rounds: [71, 72, 74], total: 217, toPar: 1 },
+  { pair: "Amparan + Ezmerlian", officialPosition: "T27", rounds: [75, 76, 66], total: 217, toPar: 1 },
+  { pair: "Jones + Oakley", officialPosition: "29", rounds: [76, 73, 70], total: 219, toPar: 3 },
+  { pair: "Roudebush + Gutesha", officialPosition: "30", rounds: [75, 74, 77], total: 226, toPar: 10 },
+  { pair: "Elkington + Tracy", officialPosition: "WD", rounds: [75, 69, null], withdrawnRound: 2, total: 144, toPar: null },
+  { pair: "Espon + Kendrick", officialPosition: "WD", rounds: [72, 75, null], withdrawnRound: 2, total: 147, toPar: null },
 ];
 
 const SUFFIX = /^(jr|sr|ii|iii|iv)\.?$/i;
@@ -64,13 +66,18 @@ export function pairKey(names: [string, string]) {
   return `${lastName(names[0])} + ${lastName(names[1])}`;
 }
 
-function posting(strokes: number | null) {
+function posting(strokes: number | null, withdrawn = false) {
+  if (withdrawn) return { strokes: null, status: "withdrawn" as const };
   return strokes == null ? notPostedRound() : { strokes, status: "complete" as const };
 }
 
 export function scoreFromEntry(entry: MidAmScoreEntry): FourBallScore {
   return {
-    rounds: [posting(entry.rounds[0]), posting(entry.rounds[1]), posting(entry.rounds[2])],
+    rounds: [
+      posting(entry.rounds[0], entry.withdrawnRound === 0),
+      posting(entry.rounds[1], entry.withdrawnRound === 1),
+      posting(entry.rounds[2], entry.withdrawnRound === 2),
+    ],
     total: entry.total,
     toPar: entry.toPar,
     thru: null,

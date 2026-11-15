@@ -1,7 +1,7 @@
 export type RoundPosting = {
   /** Gross better-ball strokes. Null when the source has not printed a number. */
   strokes: number | null;
-  status: "not_posted" | "incomplete" | "complete";
+  status: "not_posted" | "incomplete" | "complete" | "withdrawn";
 };
 
 export type FourBallScore = {
@@ -146,6 +146,7 @@ export function standings(teams: FourBallTeam[], division?: FourBallTeam["divisi
 
 export function roundCell(score: FourBallScore | null, index: 0 | 1 | 2): string {
   const round = score?.rounds[index];
+  if (round?.status === "withdrawn") return "WD";
   if (!round || round.status === "not_posted" || round.strokes == null) return "";
   return String(round.strokes);
 }
@@ -161,7 +162,10 @@ export function auditScore(score: FourBallScore, pars: Array<number | null>): st
   const complete = score.rounds.filter((round) => round.status === "complete");
   score.rounds.forEach((round, index) => {
     if (round.status === "not_posted" && round.strokes != null) problems.push(`round ${index + 1} has strokes but is not posted`);
-    if (round.status !== "not_posted" && round.strokes == null) problems.push(`round ${index + 1} is posted without strokes`);
+    if (round.status === "withdrawn" && round.strokes != null) problems.push(`round ${index + 1} is withdrawn with strokes`);
+    if (round.status !== "not_posted" && round.status !== "withdrawn" && round.strokes == null) {
+      problems.push(`round ${index + 1} is posted without strokes`);
+    }
     if (round.strokes != null && round.strokes <= 0) problems.push(`round ${index + 1} strokes are not a posted total`);
   });
   if (incomplete.length > 0 && !score.thru && score.total != null) {
@@ -179,6 +183,9 @@ export function auditScore(score: FourBallScore, pars: Array<number | null>): st
     }
   }
   if (score.toPar != null) {
+    if (score.rounds.some((round) => round.status === "withdrawn")) {
+      problems.push("to-par is set on a withdrawn card");
+    }
     const missingPar = score.rounds.some((round, index) => round.status === "complete" && pars[index] == null);
     if (incomplete.length > 0 || missingPar || score.total == null) {
       problems.push("to-par needs a total and a par for every completed round");

@@ -6,7 +6,7 @@ import { midAmBoardIndex, midAmScoreFor, seniorBoardIndex, seniorScoreFor, unuse
 import { EWING_EVENT_SLUG } from "./ewing-event";
 
 /** When the public site was checked for a scoring link. Not the field-sheet time. */
-const SCORING_CHECKED_AT = "2026-11-15T06:38:00-06:00";
+const SCORING_CHECKED_AT = "2026-11-15T14:43:00-06:00";
 
 export { EWING_EVENT_SLUG };
 
@@ -58,6 +58,7 @@ export const EWING_SNAPSHOT = {
     { url: "https://www.golfgenius.com/pages/12440584375098158373", title: "Golf Genius tournament results", outcome: "loaded" },
     { url: "https://www.golfgenius.com/v2tournaments/12440584571592912099?called_from=widgets%2Ftournament_results&player_stats_for_portal=true&round_index=1", title: "Golf Genius mid-amateur round 1 results", outcome: "loaded" },
     { url: "https://www.golfgenius.com/v2tournaments/12440584571592912099?called_from=widgets%2Ftournament_results&player_stats_for_portal=true&round_index=2", title: "Golf Genius mid-amateur round 2 results", outcome: "loaded" },
+    { url: "https://www.golfgenius.com/v2tournaments/12440584571592912099?called_from=widgets%2Ftournament_results&player_stats_for_portal=true&round_index=3", title: "Golf Genius mid-amateur final-round results", outcome: "loaded" },
     { url: "https://www.golfgenius.com/v2tournaments/13232099867553181053?called_from=widgets%2Ftournament_results&player_stats_for_portal=true&round_index=1", title: "Golf Genius senior round 1 results", outcome: "loaded" },
     { url: "https://www.golfgenius.com/v2tournaments/13232099867553181053?called_from=widgets%2Ftournament_results&player_stats_for_portal=true&round_index=2", title: "Golf Genius senior round 2 results", outcome: "loaded" },
   ] satisfies SourceRead[],
@@ -86,9 +87,9 @@ export const EWING_SNAPSHOT = {
       label: "Sunday",
       date: "2026-11-15",
       course: "Blue Course",
-      detail: "Final round. Full field start at 8:30 AM.",
+      detail: "Final round on the Blue Course.",
       publicLine: "Full field start at 8:30 AM.",
-      par: null,
+      par: 72,
     },
   ] satisfies PlannedRound[],
   teams: [

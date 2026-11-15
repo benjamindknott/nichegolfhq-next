@@ -8,6 +8,7 @@ import {
   progressKey,
   standings,
   totalCell,
+  roundCell,
   type FourBallScore,
   type FourBallTeam,
 } from "../src/data/hubs/four-ball";
@@ -129,7 +130,45 @@ if (toPar.length) throw new Error(`Supported to-par failed: ${toPar.join("; ")}`
 const unsupported = auditScore({ ...twoRounds(70, 72, 142), toPar: -2 }, [null, 72, null]);
 if (!unsupported.some((problem) => problem.includes("to-par"))) throw new Error("To-par without Blue par was accepted");
 
+const withdrawn = score({
+  total: 144,
+  officialPosition: "WD",
+  rounds: [
+    { strokes: 75, status: "complete" },
+    { strokes: 69, status: "complete" },
+    { strokes: null, status: "withdrawn" },
+  ],
+});
+if (roundCell(withdrawn, 2) !== "WD") throw new Error("Withdrawn round did not render as WD");
+if (totalCell(withdrawn) !== "144") throw new Error("Withdrawn total was not the completed-round sum");
+const withdrawnAudit = auditScore(withdrawn, [72, 72, 72]);
+if (withdrawnAudit.length) throw new Error(`Valid withdrawn card failed: ${withdrawnAudit.join("; ")}`);
+const withdrawnToPar = auditScore({ ...withdrawn, toPar: 0 }, [72, 72, 72]);
+if (!withdrawnToPar.some((problem) => problem.includes("withdrawn"))) throw new Error("To-par on a withdrawn card was accepted");
+const withdrawnZero = auditScore({
+  ...withdrawn,
+  rounds: [
+    { strokes: 75, status: "complete" },
+    { strokes: 69, status: "complete" },
+    { strokes: 0, status: "complete" },
+  ],
+  total: 144,
+}, [72, 72, 72]);
+if (!withdrawnZero.some((problem) => problem.includes("strokes are not a posted total") || problem.includes("does not match"))) {
+  throw new Error("A fabricated zero on a withdrawn round was accepted");
+}
+const withdrawnBoard = standings([
+  team("wd-finisher", "mid-am", ["Wd Finisher", "Wd Partner"], score({ ...twoRounds(62, 70, 132), officialPosition: "1" })),
+  team("wd-team", "mid-am", ["Wd One", "Wd Two"], withdrawn),
+]);
+if (withdrawnBoard[0]?.id !== "wd-finisher") throw new Error("A withdrawal was ranked ahead of a finisher");
+if (withdrawnBoard[1]?.position !== "WD" || withdrawnBoard[1].rankNote !== "official") throw new Error("Withdrawal place was not official WD");
+const withdrawnHtml = renderToStaticMarkup(createElement(FourBallBoard, { rows: withdrawnBoard }));
+if (!withdrawnHtml.includes("WD")) throw new Error("Board did not print WD");
+if (withdrawnHtml.includes(">0<")) throw new Error("Withdrawn board printed a fabricated zero");
+
 verifyEwingSnapshot();
+
 if (!hasTimezoneOffset("2026-11-13T18:00:00-05:00")) throw new Error("DST offset -05:00 was rejected");
 if (!hasTimezoneOffset("2026-11-07T19:04:00-06:00")) throw new Error("Standard offset -06:00 was rejected");
 if (hasTimezoneOffset("2026-11-07T19:04:00")) throw new Error("Missing offset was accepted");
@@ -148,31 +187,57 @@ for (const team of midAm) {
   if (score.rounds[1]?.status !== "complete" || score.rounds[1].strokes == null) {
     throw new Error(`${team.names.join(" + ")} is missing a completed round 2`);
   }
-  if (score.rounds[2]?.status !== "not_posted" || score.rounds[2].strokes != null) {
-    throw new Error(`${team.names.join(" + ")} has a posted final round before that round was played`);
+  if (score.officialPosition === "WD") {
+    if (score.rounds[2]?.status !== "withdrawn" || score.rounds[2].strokes != null) {
+      throw new Error(`${team.names.join(" + ")} is not recorded as withdrawn in the final round`);
+    }
+    if (score.total !== score.rounds[0].strokes + score.rounds[1].strokes) {
+      throw new Error(`${team.names.join(" + ")} withdrawn total does not match rounds 1 and 2`);
+    }
+    if (score.toPar != null) throw new Error(`${team.names.join(" + ")} has a to-par after withdrawing`);
+    continue;
   }
-  if (score.total !== score.rounds[0].strokes + score.rounds[1].strokes) {
-    throw new Error(`${team.names.join(" + ")} total does not match rounds 1 and 2`);
+  if (score.rounds[2]?.status !== "complete" || score.rounds[2].strokes == null) {
+    throw new Error(`${team.names.join(" + ")} is missing a completed final round`);
+  }
+  if (score.total !== score.rounds[0].strokes + score.rounds[1].strokes + score.rounds[2].strokes) {
+    throw new Error(`${team.names.join(" + ")} total does not match all three rounds`);
   }
 }
 const midAmBoard = standings(midAm, "mid-am");
-if (midAmBoard[0]?.names.join(" + ") !== "Robbie Keyes + Michael Sass") throw new Error("Round 2 leader was not first");
-if (midAmBoard[0]?.position !== "1" || midAmBoard[0].rankNote !== "official") throw new Error("Round 2 leader place was not official");
-if (midAmBoard[0]?.score?.total !== 132 || midAmBoard[0]?.score?.toPar !== -12) throw new Error("Round 2 leader total was not 132, -12");
-if (midAmBoard[0]?.score?.rounds[1]?.strokes !== 70) throw new Error("Round 2 leader gold-course score was not 70");
+if (midAmBoard[0]?.names.join(" + ") !== "Robbie Keyes + Michael Sass") throw new Error("Final-round winner was not first");
+if (midAmBoard[0]?.position !== "1" || midAmBoard[0].rankNote !== "official") throw new Error("Final-round winner place was not official");
+if (midAmBoard[0]?.score?.total !== 198 || midAmBoard[0]?.score?.toPar !== -18) throw new Error("Winner total was not 198, -18");
+if (midAmBoard[0]?.score?.rounds[2]?.strokes !== 66) throw new Error("Winner final-round score was not 66");
+if (midAmBoard[1]?.names.join(" + ") !== "Michael Randle + Zac Verses" || midAmBoard[1]?.score?.total !== 205) {
+  throw new Error("Runner-up was not Randle and Verses at 205");
+}
 if (midAmBoard.some((row) => row.rankNote !== "official" || !row.position)) throw new Error("A mid-am team was missing its official place");
-if (midAmBoard.at(-1)?.names.join(" + ") !== "Colby Amparan + Gary Ezmerlian" || midAmBoard.at(-1)?.position !== "32") {
-  throw new Error("Round 2 last place was not 32nd");
+if (midAmBoard.map((row) => row.position).join(",") !== "1,2,T3,T3,T5,T5,T7,T7,T7,T10,T10,T10,T10,T10,T15,T15,T15,T18,T18,T18,T21,T21,T23,T23,25,26,T27,T27,29,30,WD,WD") {
+  throw new Error("Final official place order changed");
 }
-if (midAmBoard.at(-1)?.score?.total !== 151) throw new Error("Round 2 last place total was not 151");
-if (midAmBoard.map((row) => row.position).join(",") !== "1,T2,T2,T4,T4,T4,T7,T7,T7,T10,T10,T10,T10,T14,T14,T14,T17,T17,T17,T17,T17,22,T23,T23,T25,T25,T25,T28,T28,T30,T30,32") {
-  throw new Error("Round 2 official place order changed");
+if (midAmBoard.find((row) => row.names.join(" + ") === "Steve Paterson + Austin Chung")?.score?.rounds[2]?.strokes !== 65) {
+  throw new Error("Paterson and Chung did not have the low final round of 65");
 }
-if (midAmBoard.find((row) => row.names.join(" + ") === "Jonathan Keane + Andrew Grice")?.position !== "T14") {
-  throw new Error("Keane and Grice should be T14 after round 2");
+if (midAmBoard.find((row) => row.names.join(" + ") === "James Minahan + Charlie Holland")?.position !== "T18") {
+  throw new Error("Defending champions should be T18");
 }
-if (midAmBoard.find((row) => row.names.join(" + ") === "Ryan Munson + Daniel Mitchell")?.position !== "T7") {
-  throw new Error("Munson and Mitchell should be T7 after round 2");
+if (midAmBoard.find((row) => row.names.join(" + ") === "Jonathan Keane + Andrew Grice")?.position !== "T23") {
+  throw new Error("Keane and Grice should be T23");
+}
+if (midAmBoard.find((row) => row.names.join(" + ") === "Jonathan Keane + Andrew Grice")?.score?.total !== 214) {
+  throw new Error("Keane and Grice total was not 214");
+}
+const withdrawals = midAmBoard.filter((row) => row.position === "WD");
+if (withdrawals.length !== 2) throw new Error("Expected two mid-am withdrawals");
+if (withdrawals.some((row) => row.score?.rounds[2]?.status !== "withdrawn" || roundCell(row.score, 2) !== "WD")) {
+  throw new Error("A withdrawal did not render as WD in the final round");
+}
+if (withdrawals[0]?.names.join(" + ") !== "Sam Elkington + Zach Tracy" || withdrawals[0]?.score?.total !== 144) {
+  throw new Error("Elkington and Tracy withdrawal was not recorded correctly");
+}
+if (withdrawals[1]?.names.join(" + ") !== "Ryder Espon + Matt Kendrick" || withdrawals[1]?.score?.total !== 147) {
+  throw new Error("Espon and Kendrick withdrawal was not recorded correctly");
 }
 
 const senior = EWING_SNAPSHOT.teams.filter((team) => team.division === "senior");
