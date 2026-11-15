@@ -3096,6 +3096,20 @@ export const MIDAM_TOURNAMENTS: Tournament[] = [
     ],
     news: [
       {
+        slug: "2026-ewing-cup-four-ball-final-recap",
+        title: "Keyes and Sass Win the Ewing Cup Four-Ball Wire-to-Wire by Seven Shots",
+        date: "2026-11-15",
+        author: "midamgolfHQ Staff",
+        summary:
+          "Keyes and Sass closed with a 6-under 66 on the Blue Course to win the Ewing Cup Four-Ball wire-to-wire at 18-under 198, seven shots clear of the field.",
+        content: [
+          "Robbie Keyes and Michael Sass closed with a 6-under 66 on the Blue Course at Dallas Athletic Club on Sunday to win the Ewing Cup Four-Ball wire-to-wire. They finished at 18-under 198, seven shots clear of the field. Their opening 10-under 62 included an eagle 2 on the 8th, and the pair has also qualified for next year's U.S. Amateur Four-Ball.",
+          "Michael Randle and Zac Verses finished second at 11-under 205 after a 4-under 68. Kolton Crawford and Sean Heidrick are tied for third with Ryan Zamorano and Todd McCarroll at 10-under 206, Zamorano and McCarroll closing with a 66.",
+          "Steve Paterson and Austin Chung posted the low round of the day, a 7-under 65, to reach 9-under 207 and a tie for fifth with Kenny Cook and Sean Rowen. Defending champions James Minahan and Charlie Holland finished tied for 18th at 4-under 212. Jonathan Keane and Andrew Grice are tied for 23rd at 2-under 214.",
+          "Full scores are on the [Ewing Cup hub](https://www.nichegolfhq.com/midamgolfhq/ewing-cup-four-ball).",
+        ],
+      },
+      {
         slug: "2026-ewing-cup-four-ball-round-2-recap",
         title: "Keyes and Sass Go Bogey-Free on the Gold Course to Lead the Ewing Cup Four-Ball by Five",
         date: "2026-11-14",
