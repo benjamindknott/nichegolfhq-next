@@ -6,7 +6,7 @@ import { midAmBoardIndex, midAmScoreFor, seniorBoardIndex, seniorScoreFor, unuse
 import { EWING_EVENT_SLUG } from "./ewing-event";
 
 /** When the public site was checked for a scoring link. Not the field-sheet time. */
-const SCORING_CHECKED_AT = "2026-11-14T14:55:00-06:00";
+const SCORING_CHECKED_AT = "2026-11-15T06:38:00-06:00";
 
 export { EWING_EVENT_SLUG };
 
