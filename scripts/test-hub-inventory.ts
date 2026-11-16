@@ -142,7 +142,7 @@ if (classifyCalendar({}) !== "unknown") throw new Error("A blank date was classi
 const lupton = items.find((item) => item.slug === "john-t-lupton-memorial");
 const gasparilla = items.find((item) => item.slug === "gasparilla-invitational");
 if (lupton?.calendar !== "rescheduled-out") throw new Error(`Lupton calendar is ${lupton?.calendar}`);
-if (gasparilla?.calendar !== "played-in-2026") throw new Error(`Gasparilla calendar is ${gasparilla?.calendar}`);
+if (gasparilla?.calendar !== "scheduled-2027") throw new Error(`Gasparilla calendar is ${gasparilla?.calendar}`);
 if (summary.calendar.rescheduledOut < 1 || summary.calendar.rescheduledOut >= summary.total) {
   throw new Error("Rescheduled count is not a real subset");
 }
@@ -1386,6 +1386,12 @@ assertSingleFormat(orangePage, orangeBowl.format, "Junior Orange Bowl");
 assertSingleFormat(bogartHtml, "54-hole stroke play", "Ralph Bogart");
 if (!gasparillaPage.includes("2026 Results") || !gasparillaPage.includes("Hayes Brown") || !gasparillaPage.includes(">Par<") || !gasparillaPage.includes(">70<")) {
   throw new Error("Gasparilla scoring label, board, or par was dropped");
+}
+if (!gasparillaPage.includes("Feb 18–20, 2027") || gasparillaPage.includes("Feb 19–21, 2026") || !gasparillaPage.includes("2026 champion")) {
+  throw new Error("Gasparilla hub dates or 2026 champion label are wrong");
+}
+if (gasparillaPage.includes("Live Scoring")) {
+  throw new Error("Gasparilla hub presents 2026 Golf Genius as live scoring");
 }
 if (!gasparillaPage.includes(">How to play</button>") || !gasparillaPage.includes('href="https://gasparillainvitational.com/"') || !gasparillaPage.includes("Apply for invite here") || gasparillaPage.includes("Qualifying held the Monday before the event")) {
   throw new Error("Gasparilla application tab was dropped or added extra text");

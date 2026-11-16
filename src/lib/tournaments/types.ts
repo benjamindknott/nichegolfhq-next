@@ -63,12 +63,13 @@ export interface Tournament {
   dates2026?: string;
   dates2025?: string;
   typicalDates?: string;
-  // Exact ISO dates for the event. Preferred over `dates2026` for
-  // ticker logic and consistent UI date formatting.
+  // Exact ISO dates for the current/next edition shown on the hub and home widget.
+  // Preferred over `dates2026` for ticker logic and consistent UI date formatting.
   startDate?: string; // ISO "YYYY-MM-DD"
   endDate?: string; // ISO "YYYY-MM-DD" (omit for single-day events)
-  // Next edition, used by the home "Up next" widget and ticker. Leave
-  // startDate/endDate as the completed edition so the tournament hub is unchanged.
+  // Next edition, used by the home "Up next" widget when startDate still
+  // describes a completed edition. May match startDate/endDate once the hub
+  // has been advanced.
   nextStartDate?: string; // ISO "YYYY-MM-DD"
   nextEndDate?: string; // ISO "YYYY-MM-DD"
 

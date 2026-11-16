@@ -17,6 +17,7 @@ import { TournamentNews } from "@/components/tournaments/TournamentNews";
 import { RelatedEvents } from "@/components/tournaments/RelatedEvents";
 import { FormatHub } from "@/components/hubs/FormatHub";
 import { isFormatHub } from "@/data/hubs/inventory";
+import { resolveDatesLabel } from "@/lib/tournaments/dates";
 
 export const dynamicParams = false;
 
@@ -102,7 +103,7 @@ export async function generateMetadata({
   const t = getMidAmTournamentBySlug(slug);
   if (!t) return { title: "midamgolfHQ" };
 
-  const dates = t.dates2026 ?? t.typicalDates;
+  const dates = resolveDatesLabel(t.startDate, t.endDate, t.dates2026 ?? t.typicalDates);
   const subtitle = `${t.course} \u2022 ${t.location}${dates ? ` \u2022 ${dates}` : ""}`;
 
   return {

@@ -12,6 +12,7 @@ export type HubTemplate = "legacy" | "format-hub" | "ewing-dedicated";
 export type CalendarStanding =
   | "played-in-2026"
   | "scheduled-2026"
+  | "scheduled-2027"
   | "in-progress-2026"
   | "year-only-2026"
   | "rescheduled-out"
@@ -235,16 +236,20 @@ export function classifyCalendar(
   asOf = AS_OF,
 ): CalendarStanding {
   const label = (input.dates2026 ?? "").replace(/[–—]/g, "-").trim();
-  if (/reschedul/i.test(label) && /2027/.test(label)) return "rescheduled-out";
-  if (/\b2027\b/.test(label) && !/2026/.test(label)) return "rescheduled-out";
-  if (/^reschedul/i.test(label) || (/\bTBD\b/i.test(label) && !/2026/.test(label))) return "unknown";
   const start = input.startDate ?? "";
   const end = input.endDate || start;
+  if (/reschedul/i.test(label) && /2027/.test(label)) return "rescheduled-out";
+  // A dated 2027 next edition is not a reschedule just because the label mentions 2027.
+  if (/\b2027\b/.test(label) && !/2026/.test(label) && !start.startsWith("2027") && !end.startsWith("2027")) return "rescheduled-out";
+  if (/^reschedul/i.test(label) || (/\bTBD\b/i.test(label) && !/2026/.test(label))) return "unknown";
   if (start.startsWith("2026") || (end && end.startsWith("2026"))) {
     if (input.liveStatus === "completed") return "played-in-2026";
     if (input.liveStatus === "live" || (start <= asOf && end >= asOf)) return "in-progress-2026";
     if (end < asOf) return "played-in-2026";
     if (start > asOf) return "scheduled-2026";
+  }
+  if (start.startsWith("2027") || (end && end.startsWith("2027"))) {
+    if (start > asOf) return "scheduled-2027";
   }
   if (/\b2026\b/.test(label)) return "year-only-2026";
   return "unknown";
@@ -253,6 +258,8 @@ export function classifyCalendar(
 export function championLabel(resultYear: number, editionYear: number, standing: CalendarStanding): string {
   if (standing === "played-in-2026" && resultYear === editionYear) return `${resultYear} champion`;
   if (standing === "in-progress-2026" && resultYear === editionYear) return `${resultYear} leader`;
+  // Next edition already dated, with last year's result still on the hub.
+  if (standing === "scheduled-2027" && resultYear) return `${resultYear} champion`;
   return "Defending champion";
 }
 
@@ -352,6 +359,7 @@ export function inventorySummary(items: HubInventoryItem[] = listHubInventory())
     calendar: {
       played: items.filter((item) => item.calendar === "played-in-2026").length,
       scheduled: items.filter((item) => item.calendar === "scheduled-2026").length,
+      scheduled2027: items.filter((item) => item.calendar === "scheduled-2027").length,
       inProgress: items.filter((item) => item.calendar === "in-progress-2026").length,
       yearOnly: items.filter((item) => item.calendar === "year-only-2026").length,
       rescheduledOut: items.filter((item) => item.calendar === "rescheduled-out").length,
