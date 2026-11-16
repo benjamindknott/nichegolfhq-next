@@ -250,28 +250,54 @@ for (const team of senior) {
   if (score.rounds[1]?.status !== "complete" || score.rounds[1].strokes == null) {
     throw new Error(`${team.names.join(" + ")} is missing a completed round 2`);
   }
-  if (score.rounds[2]?.status !== "not_posted" || score.rounds[2].strokes != null) {
-    throw new Error(`${team.names.join(" + ")} has a posted final round before that round was played`);
+  if (score.officialPosition === "WD") {
+    if (score.rounds[2]?.status !== "withdrawn" || score.rounds[2].strokes != null) {
+      throw new Error(`${team.names.join(" + ")} is not recorded as withdrawn in the final round`);
+    }
+    if (score.total !== score.rounds[0].strokes + score.rounds[1].strokes) {
+      throw new Error(`${team.names.join(" + ")} withdrawn total does not match rounds 1 and 2`);
+    }
+    if (score.toPar != null) throw new Error(`${team.names.join(" + ")} has a to-par after withdrawing`);
+    continue;
   }
-  if (score.total !== score.rounds[0].strokes + score.rounds[1].strokes) {
-    throw new Error(`${team.names.join(" + ")} total does not match rounds 1 and 2`);
+  if (score.rounds[2]?.status !== "complete" || score.rounds[2].strokes == null) {
+    throw new Error(`${team.names.join(" + ")} is missing a completed final round`);
+  }
+  if (score.total !== score.rounds[0].strokes + score.rounds[1].strokes + score.rounds[2].strokes) {
+    throw new Error(`${team.names.join(" + ")} total does not match all three rounds`);
   }
 }
 const seniorBoard = standings(senior, "senior");
-if (seniorBoard[0]?.names.join(" + ") !== "Mike Lohner + Todd Vancil") throw new Error("Senior round 2 co-leader was not first");
-if (seniorBoard[1]?.names.join(" + ") !== "Lewis Stephenson + Lee Sandlin") throw new Error("Senior round 2 co-leader was not second");
-if (seniorBoard[0]?.position !== "T1" || seniorBoard[0].rankNote !== "official") throw new Error("Senior round 2 leader place was not official");
-if (seniorBoard[0]?.score?.total !== 137 || seniorBoard[0]?.score?.toPar !== -7) throw new Error("Senior round 2 leader total was not 137, -7");
+if (seniorBoard[0]?.names.join(" + ") !== "Lewis Stephenson + Lee Sandlin") throw new Error("Senior winner was not first");
+if (seniorBoard[0]?.position !== "1" || seniorBoard[0].rankNote !== "official") throw new Error("Senior winner place was not official");
+if (seniorBoard[0]?.score?.total !== 205 || seniorBoard[0]?.score?.toPar !== -11) throw new Error("Senior winner total was not 205, -11");
+if (seniorBoard[0]?.score?.rounds[2]?.strokes !== 68) throw new Error("Senior winner final-round score was not 68");
+if (seniorBoard[1]?.names.join(" + ") !== "John Stollenwerck + Neal Barfield" || seniorBoard[1]?.score?.total !== 206) {
+  throw new Error("Senior runner-up was not Stollenwerck and Barfield at 206");
+}
+if (seniorBoard[2]?.names.join(" + ") !== "Mike Lohner + Todd Vancil" || seniorBoard[2]?.score?.total !== 208) {
+  throw new Error("Senior third was not Lohner and Vancil at 208");
+}
 if (seniorBoard.some((row) => row.rankNote !== "official" || !row.position)) throw new Error("A senior team was missing its official place");
-if (seniorBoard.at(-1)?.names.join(" + ") !== "Gene Aube + Russ Childers" || seniorBoard.at(-1)?.position !== "20") {
-  throw new Error("Senior round 2 last place was not 20th");
+if (seniorBoard.map((row) => row.position).join(",") !== "1,2,3,T4,T4,T6,T6,8,9,10,T11,T11,13,14,15,16,17,18,WD,WD") {
+  throw new Error("Senior final official place order changed");
 }
-if (seniorBoard.at(-1)?.score?.total !== 155) throw new Error("Senior round 2 last place total was not 155");
-if (seniorBoard.map((row) => row.position).join(",") !== "T1,T1,3,4,5,T6,T6,8,T9,T9,T11,T11,T11,T11,T15,T15,T17,T17,19,20") {
-  throw new Error("Senior round 2 official place order changed");
+if (seniorBoard.find((row) => row.names.join(" + ") === "Kirk Johnson + Tray Tyner")?.score?.total !== 210) {
+  throw new Error("Johnson and Tyner total was not 210");
 }
-if (seniorBoard.find((row) => row.names.join(" + ") === "John Stollenwerck + Neal Barfield")?.position !== "3") {
-  throw new Error("Senior Stollenwerck and Barfield should be 3rd after round 2");
+if (seniorBoard.find((row) => row.names.join(" + ") === "John Brellenthin + Tim Peterson")?.score?.rounds[2]?.strokes !== 70) {
+  throw new Error("Brellenthin and Peterson final-round score was not 70");
+}
+const seniorWithdrawals = seniorBoard.filter((row) => row.position === "WD");
+if (seniorWithdrawals.length !== 2) throw new Error("Expected two senior withdrawals");
+if (seniorWithdrawals.some((row) => row.score?.rounds[2]?.status !== "withdrawn" || roundCell(row.score, 2) !== "WD")) {
+  throw new Error("A senior withdrawal did not render as WD in the final round");
+}
+if (seniorWithdrawals[0]?.names.join(" + ") !== "Bill Steen + Rick Houston" || seniorWithdrawals[0]?.score?.total !== 141) {
+  throw new Error("Steen and Houston withdrawal was not recorded correctly");
+}
+if (seniorWithdrawals[1]?.names.join(" + ") !== "Mike Peck + Steve Love" || seniorWithdrawals[1]?.score?.total !== 150) {
+  throw new Error("Peck and Love withdrawal was not recorded correctly");
 }
 if (senior.some((team) => team.names.includes("John Stollenwerck Jr"))) {
   throw new Error("Mid-am John Stollenwerck Jr was merged into the senior field");
