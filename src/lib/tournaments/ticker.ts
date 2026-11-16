@@ -1,4 +1,5 @@
 import { MIDAM_TOURNAMENTS } from "@/data/tournaments/midam";
+import { midAmUpcomingDisplay } from "@/lib/tournaments/midam";
 import { JUNIOR_MAJOR_EVENTS_2026, type JuniorMajorEvent } from "@/lib/juniorMajors";
 import { SENIOR_MAJOR_EVENTS_2026, type SeniorMajorEvent } from "@/lib/seniorMajors";
 import type { Tournament } from "@/lib/tournaments/types";
@@ -193,13 +194,16 @@ function midamCards(today: Date): TickerCard[] {
   const explicitLive = MIDAM_TOURNAMENTS.filter((t) => t.liveStatus === "live");
   if (explicitLive.length > 0) return explicitLive.map((t) => midamTickerCard(t, "live"));
 
-  const events: ResolverEvent<Tournament>[] = MIDAM_TOURNAMENTS.map((t) => ({
-    event: t,
-    liveStatus: t.liveStatus,
-    dateString: t.dates2026,
-    startDate: t.startDate,
-    endDate: t.endDate,
-  }));
+  const events: ResolverEvent<Tournament>[] = MIDAM_TOURNAMENTS.map((t) => {
+    const displayed = t.liveStatus === "next" ? midAmUpcomingDisplay(t) : t;
+    return {
+      event: displayed,
+      liveStatus: t.liveStatus,
+      dateString: displayed.dates2026,
+      startDate: displayed.startDate,
+      endDate: displayed.endDate,
+    };
+  });
   const resolved = resolveActiveEvent(events, today);
   return resolved ? [midamTickerCard(resolved.event, resolved.status)] : [];
 }

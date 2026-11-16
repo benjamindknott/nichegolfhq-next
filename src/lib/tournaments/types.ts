@@ -67,6 +67,10 @@ export interface Tournament {
   // ticker logic and consistent UI date formatting.
   startDate?: string; // ISO "YYYY-MM-DD"
   endDate?: string; // ISO "YYYY-MM-DD" (omit for single-day events)
+  // Next edition, used by the home "Up next" widget and ticker. Leave
+  // startDate/endDate as the completed edition so the tournament hub is unchanged.
+  nextStartDate?: string; // ISO "YYYY-MM-DD"
+  nextEndDate?: string; // ISO "YYYY-MM-DD"
 
   // === VENUE ===
   /** Public venue state. Set only when the stored course is not confirmed for this edition. */

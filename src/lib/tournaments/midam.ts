@@ -20,10 +20,26 @@ export function getMidAmTournamentBySlug(slug: string): Tournament | undefined {
   return MIDAM_TOURNAMENTS.find((t) => t.slug === slug);
 }
 
+// For the home widget and ticker: use next-edition dates when present, without
+// rewriting the completed edition stored on the tournament hub.
+export function midAmUpcomingDisplay(t: Tournament): Tournament {
+  if (t.liveStatus !== "next" || !t.nextStartDate) return t;
+  return {
+    ...t,
+    startDate: t.nextStartDate,
+    endDate: t.nextEndDate ?? t.nextStartDate,
+    dates2026: undefined,
+    golfGeniusUrl: undefined,
+    golfGeniusCode: undefined,
+  };
+}
+
 // Returns the first Mid-Am tournament currently flagged as live (or undefined).
 // Used by the active-tournament widget on the midamgolfHQ home page.
 export function getLiveMidAmTournament(): Tournament | undefined {
-  return MIDAM_TOURNAMENTS.find((t) => t.liveStatus === "live") || MIDAM_TOURNAMENTS.find((t) => t.liveStatus === "next");
+  const tournament =
+    MIDAM_TOURNAMENTS.find((t) => t.liveStatus === "live") || MIDAM_TOURNAMENTS.find((t) => t.liveStatus === "next");
+  return tournament ? midAmUpcomingDisplay(tournament) : undefined;
 }
 
 // Returns every Mid-Am tournament currently flagged as live. When none are live,
@@ -40,8 +56,9 @@ export function listLiveMidAmTournaments(): Tournament[] {
   if (live.length > 0) return live;
   const next = MIDAM_TOURNAMENTS.find((t) => t.liveStatus === "next");
   if (!next) return [];
-  if (!next.startDate) return [next];
-  const nextStart = Date.parse(next.startDate);
+  const presented = midAmUpcomingDisplay(next);
+  if (!presented.startDate) return [presented];
+  const nextStart = Date.parse(presented.startDate);
   const windowEnd = nextStart + UP_NEXT_COMPANION_WINDOW_DAYS * 24 * 60 * 60 * 1000;
   const companions = MIDAM_TOURNAMENTS.filter((t) => {
     if (t.slug === next.slug || t.liveStatus !== "upcoming" || !t.startDate) return false;
@@ -49,8 +66,8 @@ export function listLiveMidAmTournaments(): Tournament[] {
     return !Number.isNaN(start) && start >= nextStart && start <= windowEnd;
   })
     .sort((a, b) => a.startDate!.localeCompare(b.startDate!))
-    .map((t) => ({ ...t, liveStatus: "next" as const }));
-  return [next, ...companions];
+    .map((t) => midAmUpcomingDisplay({ ...t, liveStatus: "next" as const }));
+  return [presented, ...companions];
 }
 
 // Returns {tournament, article} for a given tournament slug + article slug, or undefined.
