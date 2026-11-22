@@ -925,7 +925,7 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
   {
     slug: "rolex-tournament-of-champions",
     name: "Rolex Tournament of Champions",
-    liveStatus: "next",
+    liveStatus: "live",
     month: "November 2026",
     startDate: "2026-11-21",
     endDate: "2026-11-25",
