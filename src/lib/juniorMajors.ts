@@ -14,6 +14,11 @@ export type JuniorMajorEvent = {
     endsOn?: string; // ISO date "YYYY-MM-DD" — widget auto-hides after this date
   officialUrl?: string;
   golfGeniusUrl?: string; // live scoring link
+  // AJGA tournament id (the number in ajga.org/tournaments/<id>/leaderboard).
+  // While liveStatus is "live", the hub reads that leaderboard into its Scoring tab.
+  ajgaTournamentId?: string;
+  // IANA zone for the event, used for the leaderboard's "updated" stamp.
+  timeZone?: string;
   winners?: { year: number; champion: string }[];
   howToPlay?: HowToPlayEntry[];
   // Venue
@@ -728,6 +733,9 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
     startDate: "2026-11-21",
     endDate: "2026-11-25",
     officialUrl: "https://www.ajga.org/tournaments/rolex-tournament-of-champions",
+    golfGeniusUrl: "https://www.ajga.org/tournaments/2026147/leaderboard",
+    ajgaTournamentId: "2026147",
+    timeZone: "America/Chicago",
     course: "TPC San Antonio \u2013 Canyons Course",
     location: "San Antonio, TX",
     coursePar: 72,
