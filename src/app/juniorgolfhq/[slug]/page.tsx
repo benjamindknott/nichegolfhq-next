@@ -9,7 +9,8 @@ import { TournamentTabs } from "@/components/tournaments/TournamentTabs";
 import { TournamentHowToPlay } from "@/components/tournaments/TournamentHowToPlay";
 import { TournamentNews } from "@/components/tournaments/TournamentNews";
 import { RelatedEvents } from "@/components/tournaments/RelatedEvents";
-import { FormatHub } from "@/components/hubs/FormatHub";
+import { FormatHub, type LiveBoard } from "@/components/hubs/FormatHub";
+import { fetchAjgaLeaderboard } from "@/lib/ajgaLeaderboard";
 import { isFormatHub } from "@/data/hubs/inventory";
 import {
   getJuniorMajorBySlug,
@@ -217,12 +218,20 @@ export default async function JuniorScheduleEventPage({
     }));
 
   if (isFormatHub("junior", tournament.slug)) {
+    // Live AJGA events read their leaderboard (cached for two minutes, so this
+    // page regenerates on that cadence). Any failure leaves the AJGA link only.
+    let live: LiveBoard | null = null;
+    if (event.liveStatus === "live" && event.ajgaTournamentId) {
+      const board = await fetchAjgaLeaderboard(event.ajgaTournamentId);
+      if (board) live = { board, timeZone: event.timeZone ?? "America/New_York" };
+    }
+
     return (
       <SiteShell brandSlug="juniorgolfhq">
         <JsonLd data={breadcrumbsLd} />
         <JsonLd data={eventLd} />
         <JsonLd data={faqLd} />
-        <FormatHub tournament={tournament} channel="junior" />
+        <FormatHub tournament={tournament} channel="junior" live={live} />
         <div className="mx-auto w-full max-w-6xl px-5 pb-10">
           <RelatedEvents events={relatedEvents} brandSlug="juniorgolfhq" brandLabel="juniorgolfHQ" />
         </div>
