@@ -12,10 +12,7 @@ const NEWSLETTER = "midamgolfhq";
 
 type Params = { issue: string };
 
-export function generateStaticParams() {
-  // Issues render on demand, then cache, same as the shared route.
-  return [];
-}
+export const revalidate = 300;
 
 export async function generateMetadata({
   params,

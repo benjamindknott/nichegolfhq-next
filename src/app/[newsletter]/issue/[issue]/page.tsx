@@ -8,10 +8,10 @@ import { normalizeBeehiivHtml } from "@/lib/beehiiv";
 import { loadIssue } from "@/lib/issues";
 import { DEFAULT_OG_IMAGE } from "@/lib/seo/structuredData";
 
-export function generateStaticParams() {
-  // Issues render on demand, then cache. An empty list keeps the build light.
-  return [];
-}
+// Render on demand, then cache. An empty generateStaticParams() list
+// marks the route as static SSG; production then throws DYNAMIC_SERVER_USAGE
+// when loadIssue fetches the feed.
+export const revalidate = 300;
 
 function cleanSnippet(input?: string | null) {
   if (!input) return "";
