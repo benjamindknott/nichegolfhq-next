@@ -6,6 +6,8 @@ import { useState } from "react";
 import { SponsorStrip } from "@/components/tournaments/SponsorStrip";
 import { TournamentNews } from "@/components/tournaments/TournamentNews";
 import { TournamentResults } from "@/components/tournaments/TournamentResults";
+import { LiveLeaderboard, LiveLeadersCard } from "@/components/hubs/LiveLeaderboard";
+import type { AjgaLeaderboard } from "@/lib/ajgaLeaderboard";
 import { resultSnapshot, scopeLabel, snapshotNames, type ResultSnapshot, type StrokeSnapshot } from "@/data/hubs/batch1-results";
 import { championLabel, classifyCalendar, classifyFormat, resultsTabLabel, strokeRoundCount, type HubChannel } from "@/data/hubs/inventory";
 import { resolveDatesLabel } from "@/lib/tournaments/dates";
@@ -50,7 +52,18 @@ const RESULTS_NOTE: Record<string, string> = {
   "dustin-johnson-world-junior": "Full results unavailable here.",
 };
 
-export function FormatHub({ tournament, channel }: { tournament: Tournament; channel: HubChannel }) {
+/** A live board read from the event's scoring page, plus the zone its "updated" stamp is shown in. */
+export type LiveBoard = { board: AjgaLeaderboard; timeZone: string };
+
+export function FormatHub({
+  tournament,
+  channel,
+  live = null,
+}: {
+  tournament: Tournament;
+  channel: HubChannel;
+  live?: LiveBoard | null;
+}) {
   const kind = classifyFormat(tournament.format);
   const resultsLabel = resultsTabLabel(kind);
   const standing = classifyCalendar(tournament);
@@ -58,7 +71,8 @@ export function FormatHub({ tournament, channel }: { tournament: Tournament; cha
   const rounds = snapshot?.kind === "stroke" ? snapshot.roundCount : strokeRoundCount(tournament.format, kind);
   const applicationLinks = (tournament.howToPlay ?? []).filter((entry) => entry.href);
   const tabs: Panel[] = ["Overview", resultsLabel, "Field", "Event", ...(applicationLinks.length ? (["How to play"] as Panel[]) : [])];
-  const [tab, setTab] = useState<Panel>("Overview");
+  // While an event is live, open on the scoreboard.
+  const [tab, setTab] = useState<Panel>(live ? resultsLabel : "Overview");
   const [round, setRound] = useState(() =>
     snapshot?.kind === "stroke" && snapshot.scope !== "published-finishers" ? snapshot.roundCount : 1,
   );
@@ -117,9 +131,17 @@ export function FormatHub({ tournament, channel }: { tournament: Tournament; cha
 
       <div className="mx-auto w-full max-w-6xl px-5 py-8 md:py-10">
         <div hidden={tab !== "Overview"}>
+          {live ? (
+            <div className="mb-8">
+              <LiveLeadersCard board={live.board} timeZone={live.timeZone} onViewAll={() => setTab(resultsLabel)} />
+            </div>
+          ) : null}
           <OverviewPanel tournament={tournament} standing={standing} channel={channel} />
         </div>
-        <div hidden={tab !== resultsLabel}>
+        <div hidden={tab !== resultsLabel || !live}>
+          {live ? <LiveLeaderboard board={live.board} timeZone={live.timeZone} /> : null}
+        </div>
+        <div hidden={tab !== resultsLabel || Boolean(live)}>
           <ResultsPanel
             tournament={tournament}
             snapshot={snapshot}
