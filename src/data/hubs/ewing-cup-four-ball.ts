@@ -105,6 +105,8 @@ export const EWING_SNAPSHOT = {
     score: (team.division === "mid-am" ? midAmScoreFor(team.names) : seniorScoreFor(team.names)) as FourBallScore | null,
   })),
   officialChampions: [
+    { year: 2026, division: "Mid Amateur", players: "Robbie Keyes and Michael Sass" },
+    { year: 2026, division: "Senior Amateur", players: "Lewis Stephenson and Lee Sandlin" },
     { year: 2025, division: "Mid Amateur", players: "Charlie Holland and James Minahan" },
     { year: 2025, division: "Senior Amateur", players: "Bob Brewer and Greg Smith" },
     { year: 2024, division: "Mid Amateur", players: "Jordan Woolf and Travis Woolf" },
@@ -121,7 +123,7 @@ export const EWING_SOURCE: FactSource = {
   url: EWING_OFFICIAL.information,
   title: "DAC Ewing Cup tournament information",
   checkedAt: SCORING_CHECKED_AT,
-  established: "Competition schedule and 2021-2025 champions by division.",
+  established: "Competition schedule and 2021-2026 champions by division.",
   kind: "public_page",
 };
 

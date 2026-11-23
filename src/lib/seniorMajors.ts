@@ -1265,6 +1265,7 @@ export const SENIOR_MAJOR_EVENTS_2026: SeniorMajorEvent[] = [
     courseYardage: 7169,
     tournamentWebsite: "https://www.ewingcup.com/",
     pastResults: [
+      { year: 2026, champion: "Lewis Stephenson & Lee Sandlin", venue: "Dallas Athletic Club" },
       { year: 2025, champion: "Bob Brewer & Greg Smith", venue: "Dallas Athletic Club" },
       { year: 2024, champion: "Bob Brewer & Greg Smith", venue: "Dallas Athletic Club" },
       { year: 2022, champion: "Mike Peck & Steve Love", venue: "Dallas Athletic Club" },

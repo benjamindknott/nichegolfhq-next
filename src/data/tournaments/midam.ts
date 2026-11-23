@@ -3156,6 +3156,7 @@ export const MIDAM_TOURNAMENTS: Tournament[] = [
       },
     ],
     pastResults: [
+      { year: 2026, champion: "Robbie Keyes & Michael Sass" },
       { year: 2025, champion: "Charlie Holland & James Minahan" },
       { year: 2024, champion: "Travis Woolf & Jordan Woolf" },
       { year: 2022, champion: "Michael Randle & Martin Board" },
