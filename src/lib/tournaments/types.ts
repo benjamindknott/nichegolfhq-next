@@ -108,6 +108,9 @@ export interface Tournament {
   golfGeniusUrlLabel?: string;
   // Golf Genius event code when no public live-scoring URL exists (shown on the hub button).
   golfGeniusCode?: string;
+  // AJGA tournament id (junior events). While live, the hub renders this leaderboard,
+  // so the home widget's Live Scoring button links to the hub instead of AJGA.
+  ajgaTournamentId?: string;
   tournamentWebsite?: string;
   tournamentWebsiteLabel?: string;
   courseWebsite?: string;
