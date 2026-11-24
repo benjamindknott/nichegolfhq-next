@@ -26,3 +26,16 @@ export async function fetchJuniorLiveBoard(event: LiveBoardSource): Promise<Ajga
   }
   return null;
 }
+
+/**
+ * True once a junior event is over: flagged "completed", or its end date has
+ * passed while it is not flagged "live". Its hub then shows the final board.
+ */
+export function isJuniorEventFinal(
+  event: { liveStatus?: string; endDate?: string },
+  today: string = new Date().toISOString().slice(0, 10),
+): boolean {
+  if (event.liveStatus === "live") return false;
+  if (event.liveStatus === "completed") return true;
+  return Boolean(event.endDate && event.endDate < today);
+}
