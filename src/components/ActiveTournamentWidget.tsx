@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Tournament } from "@/lib/tournaments/types";
 import { resolveDatesLabel } from "@/lib/tournaments/dates";
-import { ajgaTournamentIdFor } from "@/lib/ajgaTournamentId";
+import { hasJuniorLiveBoardSource } from "@/lib/juniorLiveBoard";
 
 interface Props {
   tournament: Tournament;
@@ -11,6 +11,12 @@ interface Props {
 
 export function ActiveTournamentWidget({ tournament, channelPrefix }: Props) {
   const hubHref = `${channelPrefix}/${tournament.slug}`;
+  // Junior hubs read AJGA and Golf Genius scoring into their own live board, so
+  // while live the button opens the hub rather than the scoring site.
+  const scoringOnHub =
+    tournament.liveStatus === "live" &&
+    channelPrefix === "/juniorgolfhq" &&
+    hasJuniorLiveBoardSource(tournament);
   const venueLine = [tournament.course, tournament.location]
     .filter(Boolean)
     .join(" • ");
@@ -36,7 +42,7 @@ export function ActiveTournamentWidget({ tournament, channelPrefix }: Props) {
           <div className="mt-1 text-sm font-semibold text-zinc-700">{datesLabel}</div>
         ) : null}
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-          {tournament.liveStatus === "live" && ajgaTournamentIdFor(tournament) ? (
+          {scoringOnHub ? (
             <Link
               href={hubHref}
               className="inline-flex items-center rounded-full bg-emerald-600 px-6 py-2.5 text-sm font-bold text-zinc-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-emerald-500 hover:shadow-lg"
