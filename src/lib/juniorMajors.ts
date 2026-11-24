@@ -359,6 +359,7 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
   },
   {
     slug: "womens-western-junior",
+    golfGeniusUrl: "https://womenswesternjunior.com/the-latest/results",
     name: "Women's Western Junior Championship",
     month: "June 2026",
     startDate: "2026-06-08",
@@ -470,6 +471,7 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
   },
   {
     slug: "rolex-girls-junior",
+    golfGeniusUrl: "https://www.ajga.org/tournaments/2026062/leaderboard",
     name: "Rolex Girls Junior Championship",
     month: "June 2026",
     startDate: "2026-06-15",
@@ -498,6 +500,7 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
   },
   {
     slug: "western-junior",
+    golfGeniusUrl: "https://thewesternjunior.com/2026-scores",
     name: "Western Junior Championship",
     month: "June 2026",
     startDate: "2026-06-15",
@@ -520,6 +523,7 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
   },
   {
     slug: "southern-junior-championship",
+    golfGeniusUrl: "https://www.golfgenius.com/pages/12077598880099752571",
     name: "Southern Junior Championship",
     month: "June 2026",
         liveStatus: "completed",
@@ -548,6 +552,7 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
   },
   {
     slug: "rlx-ralph-lauren-junior-classic",
+    golfGeniusUrl: "https://www.ajga.org/tournaments/2026069/leaderboard",
     name: "RLX Ralph Lauren Junior Classic",
     month: "June 2026",
     startDate: "2026-06-22",
@@ -597,6 +602,7 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
   },
   {
     slug: "wyndham-cup",
+    golfGeniusUrl: "https://www.ajga.org/tournaments/2026083/leaderboard",
     name: "Wyndham Cup",
     month: "July 2026",
     startDate: "2026-07-06",
@@ -624,6 +630,7 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
   },
   {
     slug: "us-girls-junior",
+    golfGeniusUrl: "https://championships.usga.org/usgirlsjunior/2026/scoring.html",
     name: "U.S. Girls' Junior Amateur",
     month: "July 2026",
     liveStatus: "completed",
@@ -691,7 +698,7 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
     startDate: "2026-07-28",
     endDate: "2026-07-31",
     officialUrl: "https://www.juniorpgachampionship.com/",
-    golfGeniusUrl: "https://www.pga.com/events/junior-pga-championships/embed",
+    golfGeniusUrl: "https://hpe.golfgenius.com/pages/12524028573561958109",
     // Host course rotates annually. Listed course reflects the 2025 host.
     course: "Fields Ranch East & West",
     location: "Frisco, TX",
@@ -742,6 +749,7 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
   },
   {
     slug: "us-amateur",
+    golfGeniusUrl: "https://championships.usga.org/usamateur/2026/scoring.html",
     name: "U.S. Amateur",
     month: "August 2026",
     startDate: "2026-08-10",
@@ -771,6 +779,7 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
   },
   {
     slug: "junior-solheim-cup",
+    golfGeniusUrl: "https://www.ajga.org/tournaments/2026141",
     name: "Junior Solheim Cup",
     liveStatus: "completed",
     month: "September 2026",
@@ -794,6 +803,7 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
   },
   {
     slug: "junior-players-championship",
+    golfGeniusUrl: "https://www.ajga.org/tournaments/2026135/leaderboard",
     name: "Junior Players Championship",
     month: "September 2026",
     startDate: "2026-09-04",
@@ -820,6 +830,7 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
   },
   {
     slug: "junior-presidents-cup",
+    golfGeniusUrl: "https://www.ajga.org/tournaments/2026142/leaderboard",
     name: "Junior Presidents Cup",
     liveStatus: "completed",
     month: "September 2026",
@@ -843,6 +854,7 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
   },
   {
     slug: "annika-invitational",
+    golfGeniusUrl: "https://www.ajga.org/tournaments/2026143/leaderboard",
     name: "ANNIKA Invitational",
     liveStatus: "completed",
     month: "October 2026",
@@ -870,6 +882,7 @@ export const JUNIOR_MAJOR_EVENTS_2026: JuniorMajorEvent[] = [
   },
   {
     slug: "ajga-ping-invitational",
+    golfGeniusUrl: "https://www.ajga.org/tournaments/2026844/leaderboard",
     name: "AJGA Ping Invitational",
     // Rescheduled after the October cancellation. Confirmed on the AJGA
     // tournament page (2026844): November 5-8, 2026 at Seminole Legacy.
