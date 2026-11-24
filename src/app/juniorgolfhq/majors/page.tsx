@@ -2,21 +2,58 @@ import Link from "next/link";
 import { SiteShell } from "@/components/SiteShell";
 import { listJuniorMajorsByMonth } from "@/lib/juniorMajors";
 import { resolveDatesLabel } from "@/lib/tournaments/dates";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbLd } from "@/lib/seo/structuredData";
+
+const BASE_URL = "https://www.nichegolfhq.com";
+const TITLE = "2026 Junior Golf Majors Schedule";
+const DESCRIPTION =
+  "Dates, venues and results for the 2026 junior golf majors: AJGA invitationals, USGA junior championships and top invitationals, each linked to its event hub.";
 
 export const metadata = {
-  title: "Junior Majors — 2026 | juniorgolfHQ",
-  description: "Junior majors schedule for 2026, with links to each event hub.",
+  title: `${TITLE} | juniorgolfHQ`,
+  description: DESCRIPTION,
   alternates: { canonical: "/juniorgolfhq/majors" },
+  openGraph: {
+    type: "website",
+    title: `${TITLE} | juniorgolfHQ`,
+    description: DESCRIPTION,
+    url: `${BASE_URL}/juniorgolfhq/majors`,
+    siteName: "nichegolfHQ",
+    images: [{ url: "/og/og-nichegolfhq.png", width: 1200, height: 630, alt: TITLE }],
+  },
 };
 
 export default function JuniorMajorsIndexPage() {
   const months = listJuniorMajorsByMonth();
+  const events = months.flatMap((m) => m.events);
+
+  // Server-rendered so crawlers that do not run scripts still read the list.
+  const scheduleLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: TITLE,
+    numberOfItems: events.length,
+    itemListElement: events.map((e, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: e.name,
+      url: `${BASE_URL}/juniorgolfhq/${e.slug}`,
+    })),
+  };
+  const breadcrumbsLd = breadcrumbLd([
+    { name: "Home", item: BASE_URL },
+    { name: "juniorgolfHQ", item: `${BASE_URL}/juniorgolfhq` },
+    { name: "Junior Majors", item: `${BASE_URL}/juniorgolfhq/majors` },
+  ]);
 
   return (
     <SiteShell brandSlug="juniorgolfhq">
+      <JsonLd data={scheduleLd} />
+      <JsonLd data={breadcrumbsLd} />
       <div className="mx-auto w-full max-w-5xl px-5 py-8">
         <div className="mb-8 text-center">
-          <h1 className="font-serif text-4xl font-semibold tracking-tight text-zinc-950">Junior Majors — 2026</h1>
+          <h1 className="font-serif text-4xl font-semibold tracking-tight text-zinc-950">2026 Junior Golf Majors Schedule</h1>
         </div>
 
         <div className="mx-auto grid max-w-3xl gap-4">
