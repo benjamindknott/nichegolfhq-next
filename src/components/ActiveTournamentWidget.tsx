@@ -35,7 +35,14 @@ export function ActiveTournamentWidget({ tournament, channelPrefix }: Props) {
           <div className="mt-1 text-sm font-semibold text-zinc-700">{datesLabel}</div>
         ) : null}
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-          {tournament.golfGeniusUrl ? (
+          {tournament.liveStatus === "live" && tournament.ajgaTournamentId ? (
+            <Link
+              href={hubHref}
+              className="inline-flex items-center rounded-full bg-emerald-600 px-6 py-2.5 text-sm font-bold text-zinc-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-emerald-500 hover:shadow-lg"
+            >
+              Live Scoring
+            </Link>
+          ) : tournament.golfGeniusUrl ? (
             <Link
               href={tournament.golfGeniusUrl}
               target="_blank"
