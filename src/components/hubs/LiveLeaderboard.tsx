@@ -70,7 +70,7 @@ function DivisionToggle({
   );
 }
 
-function SourceLink({ board, label = "Full leaderboard on AJGA" }: { board: AjgaLeaderboard; label?: string }) {
+function SourceLink({ board, label = `Full leaderboard on ${board.source ?? "AJGA"}` }: { board: AjgaLeaderboard; label?: string }) {
   return (
     <a
       href={board.url}
@@ -143,7 +143,7 @@ export function LiveLeaderboard({ board, timeZone }: { board: AjgaLeaderboard; t
         <LivePill />
         <h2 id="live-leaderboard-heading" className="mt-3 font-serif text-3xl font-semibold">Leaderboard</h2>
         <p className="mx-auto mt-2 max-w-xl text-sm text-zinc-600">
-          {updated ? `Updated ${updated}. ` : ""}Scores from the AJGA. Refreshes every few minutes.
+          {updated ? `Updated ${updated}. ` : ""}Scores from {board.source ?? "the AJGA"}. Refreshes every few minutes.
         </p>
       </div>
 
@@ -224,7 +224,7 @@ export function LiveLeadersCard({
         >
           Full leaderboard
         </button>
-        <SourceLink board={board} label="AJGA scoring" />
+        <SourceLink board={board} label={`${board.source ?? "AJGA"} scoring`} />
       </div>
     </section>
   );
