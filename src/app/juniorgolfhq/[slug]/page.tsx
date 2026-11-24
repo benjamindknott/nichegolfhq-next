@@ -85,6 +85,8 @@ function toTournament(
     overview: event.overview,
     tournamentWebsite: event.officialUrl,
     golfGeniusUrl: event.golfGeniusUrl,
+    // Once the event is over the scoring link holds final results.
+    golfGeniusUrlLabel: isJuniorEventFinal(event) ? "Final results" : undefined,
     pastResults:
       event.pastResults?.map((r) => ({
         year: r.year,
