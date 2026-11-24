@@ -18,14 +18,17 @@ import {
  * We read those tables and nothing else, and never fill in a value the source
  * left blank. Any failure returns `null` and the hub keeps its scoring link.
  *
+ * Newer portals use a React widget (LeaderboardV2Root) instead: its props name
+ * JSON endpoints for the round's divisions, read into the same board shape.
+ *
  * The table reader mirrors parseAjgaLeaderboard on purpose: keeping the two
  * separate means a Golf Genius change cannot break the AJGA board mid-event.
  */
 
 const USER_AGENT = "nichegolfHQ live leaderboard (+https://www.nichegolfhq.com)";
 const RESULTS_WIDGET = /\/leagues\/\d+\/widgets\/(?:customized_)?tournament_results[^"'\s<>]*/;
-const RESULTS_LINK_TEXT = /^(leaderboard|results|tournament results)$/i;
-const MAX_RESULTS_PAGES = 3;
+const RESULTS_LINK_TEXT = /^(leaderboard|results|tournament results|scoring|live scoring)$/i;
+const MAX_RESULTS_PAGES = 4;
 const MAX_DIVISIONS = 6;
 
 export function isGolfGeniusUrl(url?: string): boolean {
@@ -146,6 +149,107 @@ export function parseGolfGeniusResults(html: string, label: string): AjgaLeaderb
   return rows.length ? { label, roundLabels, rows } : null;
 }
 
+type V2Round = { name?: string; thru?: string; score?: string; total?: string };
+type V2Aggregate = {
+  name?: string;
+  position?: string;
+  affiliation?: string;
+  score?: string;
+  total?: string;
+  rounds?: V2Round[];
+};
+type V2Event = {
+  rounds?: Array<{ name?: string; index?: number }>;
+  scopes?: Array<{ aggregates?: V2Aggregate[] }>;
+};
+type V2Props = {
+  roundId?: string;
+  roundList?: Array<{ id?: string }>;
+  tournamentsUrl?: string;
+  tournamentUrl?: string;
+};
+
+async function getJson<T>(url: string): Promise<T | null> {
+  // Golf Genius answers some requests with a 503 under load; one retry covers it.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch(url, {
+        next: { revalidate: AJGA_LEADERBOARD_REVALIDATE_SECONDS },
+        headers: { "User-Agent": USER_AGENT, Accept: "application/json" },
+        signal: AbortSignal.timeout(8000),
+      });
+      if (res.ok) return (await res.json()) as T;
+    } catch {
+      // fall through to the retry
+    }
+  }
+  return null;
+}
+
+/** Fills a Golf Genius endpoint template (":round_id", ":id") and asks for the portal view. */
+function v2Url(template: string, base: string, roundId: string, id = "") {
+  const path = template.replace(":round_id", roundId).replace(":id", id).split("?")[0];
+  return new URL(`${path}?source=portal`, base).toString();
+}
+
+export function parseGolfGeniusV2Event(event: V2Event, label: string): AjgaLeaderboardDivision | null {
+  const roundLabels = [...(event.rounds ?? [])]
+    .sort((a, b) => (a.index ?? 0) - (b.index ?? 0))
+    .map((round) => clean(round.name))
+    .filter(Boolean);
+
+  const rows: AjgaLeaderboardRow[] = [];
+  for (const scope of event.scopes ?? []) {
+    for (const aggregate of scope.aggregates ?? []) {
+      const name = clean(aggregate.name);
+      if (!name) continue;
+      const byName = new Map((aggregate.rounds ?? []).map((round) => [clean(round.name), round]));
+      const played = (aggregate.rounds ?? []).filter((round) => clean(round.total) || clean(round.thru));
+      const current = played[played.length - 1];
+      rows.push({
+        pos: clean(aggregate.position),
+        name,
+        hometown: clean(aggregate.affiliation) || undefined,
+        toPar: clean(aggregate.score) || "-",
+        thru: current ? clean(current.thru) : "",
+        today: (current && clean(current.score)) || "-",
+        rounds: roundLabels.map((roundLabel) => clean(byName.get(roundLabel)?.total) || null),
+        total: clean(aggregate.total),
+      });
+    }
+  }
+  return rows.length ? { label, roundLabels, rows } : null;
+}
+
+/** The React widget: its default round's divisions, each read from its JSON endpoint. */
+async function readV2Widget(
+  widget: string,
+  props: V2Props,
+): Promise<{ ids: string[]; divisions: AjgaLeaderboardDivision[] } | null> {
+  const roundId = clean(props.roundId) || clean(props.roundList?.[0]?.id);
+  const { tournamentsUrl, tournamentUrl } = props;
+  if (!roundId || !tournamentsUrl || !tournamentUrl) return null;
+
+  const list = await getJson<{ tournaments?: Array<{ id?: string; name?: string }> }>(
+    v2Url(tournamentsUrl, widget, roundId),
+  );
+  const tournaments = (list?.tournaments ?? [])
+    .filter((tournament) => /^\d+$/.test(clean(tournament.id)))
+    .slice(0, MAX_DIVISIONS);
+  if (!tournaments.length) return null;
+
+  const labels = divisionLabels(tournaments.map((tournament) => clean(tournament.name)));
+  const events = await Promise.all(
+    tournaments.map((tournament) =>
+      getJson<{ event?: V2Event }>(v2Url(tournamentUrl, widget, roundId, clean(tournament.id))),
+    ),
+  );
+  const divisions = events
+    .map((result, index) => (result?.event ? parseGolfGeniusV2Event(result.event, labels[index]) : null))
+    .filter((division): division is AjgaLeaderboardDivision => Boolean(division));
+  return divisions.length ? { ids: tournaments.map((tournament) => clean(tournament.id)), divisions } : null;
+}
+
 export async function fetchGolfGeniusLeaderboard(portalUrl: string): Promise<AjgaLeaderboard | null> {
   if (!isGolfGeniusUrl(portalUrl)) return null;
   try {
@@ -155,6 +259,19 @@ export async function fetchGolfGeniusLeaderboard(portalUrl: string): Promise<Ajg
     if (!widgetHtml) return null;
 
     const $ = cheerio.load(widgetHtml);
+    const v2Props = $('[data-react-class="LeaderboardV2Root"]').attr("data-react-props");
+    if (v2Props) {
+      const v2 = await readV2Widget(widget, JSON.parse(v2Props) as V2Props);
+      if (!v2) return null;
+      return {
+        tournamentId: v2.ids.join(","),
+        url: portalUrl,
+        divisions: v2.divisions,
+        fetchedAt: new Date().toISOString(),
+        source: "Golf Genius",
+      };
+    }
+
     const seen = new Set<string>();
     const links: Array<{ id: string; text: string }> = [];
     $("a[data-tournament-event-id]").each((_, a) => {
