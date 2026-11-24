@@ -18,7 +18,7 @@ import {
   JUNIOR_MAJOR_EVENTS_2026,
 } from "@/lib/juniorMajors";
 import type { Tournament } from "@/lib/tournaments/types";
-import { buildFaqLd } from "@/lib/tournaments/faqLd";
+import { buildFaqLd, type FaqLatestResult } from "@/lib/tournaments/faqLd";
 
 export const dynamicParams = false
 
@@ -142,6 +142,63 @@ function monthToISO(raw: string): string | null {
   return null;
 }
 
+type JuniorEvent = NonNullable<ReturnType<typeof getJuniorMajorBySlug>>;
+
+/** The most recent champion on record: past results first, then the winners list. */
+function latestResult(event: JuniorEvent): FaqLatestResult | undefined {
+  const results: FaqLatestResult[] = [
+    ...(event.pastResults ?? []).map((r) => ({
+      year: r.year,
+      champion: r.champion,
+      score: r.score,
+      runnerUp: r.runnerUp,
+    })),
+    ...(event.winners ?? []).map((w) => ({ year: w.year, champion: w.champion })),
+  ].filter((r) => r.year && r.champion);
+  return results.sort((a, b) => b.year - a.year)[0];
+}
+
+/**
+ * Answer-first search copy for a hub. Once this edition has a champion on
+ * record it leads with the result; otherwise with when and where, plus the
+ * defending (or latest) champion. `when` feeds the FAQ markup.
+ */
+function hubSeo(event: JuniorEvent) {
+  const final = isJuniorEventFinal(event);
+  const year = Number((event.startDate ?? "").slice(0, 4)) || undefined;
+  const latest = latestResult(event);
+  const dates = formatDateRange(event.startDate, event.endDate) ?? event.dates2026 ?? event.month;
+  const venue = [event.course, event.location].filter(Boolean).join(", ");
+  const decided = Boolean(final && latest && year && latest.year === year);
+  const edition = year ? `${year} ` : "";
+
+  const title = final
+    ? `${event.name} ${edition}Results | juniorgolfHQ`
+    : `${event.name}${year ? ` ${year}` : ""}: Live Scoring & Dates | juniorgolfHQ`;
+
+  let description: string;
+  if (decided && latest) {
+    description =
+      `${latest.champion} won the ${latest.year} ${event.name}${latest.score ? ` with ${latest.score}` : ""}` +
+      `${venue ? ` at ${venue}` : ""}. Final leaderboard and past winners.`;
+  } else {
+    const champion = latest
+      ? final
+        ? ` ${latest.year} champion: ${latest.champion}.`
+        : ` Defending champion: ${latest.champion}.`
+      : "";
+    description =
+      `${event.name}${dates ? `: ${dates}` : ""}${venue ? ` at ${venue}` : ""}.${champion}` +
+      (final ? " Results and past winners." : " Live scoring and past winners.");
+  }
+
+  const when = dates
+    ? `The ${edition}${event.name} ${final ? "was played" : "is"} ${dates}${venue ? ` at ${venue}` : ""}.`
+    : undefined;
+
+  return { title, description, when, latest, final };
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -152,18 +209,16 @@ export async function generateMetadata({
   const event = getJuniorMajorBySlug(slug);
   if (!event) return { title: "juniorgolfHQ" };
 
-  const subtitle = [event.course, event.location, event.month]
-    .filter(Boolean)
-    .join(" \u2022 ");
+  const seo = hubSeo(event);
 
   return {
-    title: `${event.name} | juniorgolfHQ`,
-    description: `Dates, venue, format, and past winners for ${event.name}. ${subtitle}`,
+    title: { absolute: seo.title },
+    description: seo.description,
     alternates: { canonical: `/juniorgolfhq/${event.slug}` },
     openGraph: {
       type: "article",
-      title: `${event.name} | juniorgolfHQ`,
-      description: `Dates, venue, format, and past winners for ${event.name}. ${subtitle}`,
+      title: seo.title,
+      description: seo.description,
       url: `https://www.nichegolfhq.com/juniorgolfhq/${event.slug}`,
       siteName: "nichegolfHQ",
       images: [{ url: "/og/og-nichegolfhq.png", width: 1200, height: 630, alt: event.name }],
@@ -192,12 +247,14 @@ export default async function JuniorScheduleEventPage({
   ]);
 
   const isoDate = monthToISO(event.month);
+  const seo = hubSeo(event);
 
   const eventLd = sportsEventLd({
     name: event.name,
     url: pageUrl,
-    description: `Dates, venue, format, and past winners for ${event.name}.`,
-    liveStatus: event.liveStatus,
+    description: seo.description,
+    // A finished event is not "scheduled", even when nobody flagged it completed.
+    liveStatus: seo.final ? "completed" : event.liveStatus,
     course: event.course,
     location: event.location,
     startDate: event.startDate || isoDate || undefined,
@@ -209,6 +266,8 @@ export default async function JuniorScheduleEventPage({
     howToPlay: event.howToPlay,
     format: event.format,
     eligibility: event.eligibility,
+    when: seo.when,
+    latestResult: seo.latest,
   });
 
   const relatedEvents = JUNIOR_MAJOR_EVENTS_2026
