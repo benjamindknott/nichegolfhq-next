@@ -37,6 +37,8 @@ export type AjgaLeaderboard = {
   divisions: AjgaLeaderboardDivision[];
   /** ISO time the board was read from AJGA. */
   fetchedAt: string;
+  /** Where the scores come from, for source labels. Unset means AJGA. */
+  source?: string;
 };
 
 /** Seconds between reads. Each hub render reuses the cached board until it expires. */
