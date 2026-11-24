@@ -73,6 +73,12 @@ export function FormatHub({
   const tabs: Panel[] = ["Overview", resultsLabel, "Field", "Event", ...(applicationLinks.length ? (["How to play"] as Panel[]) : [])];
   // While an event is live, open on the scoreboard.
   const [tab, setTab] = useState<Panel>(live ? resultsLabel : "Overview");
+  // With a live board on the page, live scoring stays on the hub: open the
+  // scoreboard tab and bring the tabs into view.
+  const showLiveScoring = () => {
+    setTab(resultsLabel);
+    document.getElementById("hub-sections")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
   const [round, setRound] = useState(() =>
     snapshot?.kind === "stroke" && snapshot.scope !== "published-finishers" ? snapshot.roundCount : 1,
   );
@@ -96,7 +102,7 @@ export function FormatHub({
         {place ? <p className="mx-auto mt-2 max-w-2xl text-balance text-base text-zinc-600">{place}</p> : null}
         {dates ? <p className="mt-1 text-base font-semibold text-zinc-900">{dates}</p> : null}
         <div className="mt-3 flex flex-wrap justify-center gap-2">
-          <ScoringAccess tournament={tournament} />
+          <ScoringAccess tournament={tournament} onShowLive={live ? showLiveScoring : undefined} />
           {tournament.golfGeniusUrl && tournament.tournamentWebsite ? (
             <a
               href={tournament.tournamentWebsite}
@@ -111,7 +117,7 @@ export function FormatHub({
       </section>
 
       <div className="border-y border-zinc-200 bg-white">
-        <div className="mx-auto flex w-full max-w-6xl justify-center gap-1 overflow-x-auto px-4 py-3 [scrollbar-width:none] sm:gap-2 sm:px-5 [&::-webkit-scrollbar]:hidden" role="tablist" aria-label={`${tournament.name} sections`}>
+        <div className="mx-auto flex w-full max-w-6xl justify-center gap-1 overflow-x-auto px-4 py-3 [scrollbar-width:none] sm:gap-2 sm:px-5 [&::-webkit-scrollbar]:hidden" id="hub-sections" role="tablist" aria-label={`${tournament.name} sections`}>
           {tabs.map((item) => (
             <button
               key={item}
@@ -170,7 +176,18 @@ export function FormatHub({
   );
 }
 
-function ScoringAccess({ tournament }: { tournament: Tournament }) {
+function ScoringAccess({ tournament, onShowLive }: { tournament: Tournament; onShowLive?: () => void }) {
+  if (onShowLive) {
+    return (
+      <button
+        type="button"
+        onClick={onShowLive}
+        className="inline-flex items-center justify-center rounded-full bg-emerald-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+      >
+        Live scoring
+      </button>
+    );
+  }
   if (tournament.golfGeniusUrl) {
     const label = tournament.golfGeniusUrlLabel ?? (tournament.golfGeniusCode ? `Live scoring · ${tournament.golfGeniusCode}` : "Live scoring");
     return (
