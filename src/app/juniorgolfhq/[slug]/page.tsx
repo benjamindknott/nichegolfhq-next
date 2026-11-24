@@ -10,7 +10,7 @@ import { TournamentHowToPlay } from "@/components/tournaments/TournamentHowToPla
 import { TournamentNews } from "@/components/tournaments/TournamentNews";
 import { RelatedEvents } from "@/components/tournaments/RelatedEvents";
 import { FormatHub, type LiveBoard } from "@/components/hubs/FormatHub";
-import { fetchJuniorLiveBoard } from "@/lib/juniorLiveBoard";
+import { fetchJuniorLiveBoard, isJuniorEventFinal } from "@/lib/juniorLiveBoard";
 import { isFormatHub } from "@/data/hubs/inventory";
 import {
   getJuniorMajorBySlug,
@@ -218,13 +218,15 @@ export default async function JuniorScheduleEventPage({
     }));
 
   if (isFormatHub("junior", tournament.slug)) {
-    // Live events read their leaderboard from AJGA or Golf Genius (cached for two
-    // minutes, so this page regenerates on that cadence). Any failure leaves the
-    // scoring link only.
+    // Live and finished events read their leaderboard from AJGA or Golf Genius
+    // (cached for two minutes, so this page regenerates on that cadence). A
+    // finished event shows it as final results. Any failure leaves the scoring
+    // link only.
     let live: LiveBoard | null = null;
-    if (event.liveStatus === "live") {
+    const final = isJuniorEventFinal(event);
+    if (event.liveStatus === "live" || final) {
       const board = await fetchJuniorLiveBoard(event);
-      if (board) live = { board, timeZone: event.timeZone ?? "America/New_York" };
+      if (board) live = { board, timeZone: event.timeZone ?? "America/New_York", final };
     }
 
     return (
