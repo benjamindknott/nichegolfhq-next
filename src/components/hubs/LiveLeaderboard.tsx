@@ -29,7 +29,14 @@ function ScoreToPar({ value, strong }: { value: string; strong?: boolean }) {
   );
 }
 
-function LivePill() {
+function LivePill({ final = false }: { final?: boolean }) {
+  if (final) {
+    return (
+      <span className="inline-flex items-center rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white">
+        Final
+      </span>
+    );
+  }
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-800 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white">
       <span className="relative flex h-1.5 w-1.5">
@@ -130,7 +137,16 @@ function LeaderboardTable({ rows, roundLabels, caption }: { rows: AjgaLeaderboar
 }
 
 /** Scoring tab: the full live board, by division. */
-export function LiveLeaderboard({ board, timeZone }: { board: AjgaLeaderboard; timeZone: string }) {
+export function LiveLeaderboard({
+  board,
+  timeZone,
+  final = false,
+}: {
+  board: AjgaLeaderboard;
+  timeZone: string;
+  /** The event is over: label the board Final and drop the refresh wording. */
+  final?: boolean;
+}) {
   const [division, setDivision] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const active = board.divisions[division] ?? board.divisions[0];
@@ -140,10 +156,16 @@ export function LiveLeaderboard({ board, timeZone }: { board: AjgaLeaderboard; t
   return (
     <section aria-labelledby="live-leaderboard-heading">
       <div className="text-center">
-        <LivePill />
+        <LivePill final={final} />
         <h2 id="live-leaderboard-heading" className="mt-3 font-serif text-3xl font-semibold">Leaderboard</h2>
         <p className="mx-auto mt-2 max-w-xl text-sm text-zinc-600">
-          {updated ? `Updated ${updated}. ` : ""}Scores from {board.source ?? "the AJGA"}. Refreshes every few minutes.
+          {final ? (
+            <>Final results from {board.source ?? "the AJGA"}.</>
+          ) : (
+            <>
+              {updated ? `Updated ${updated}. ` : ""}Scores from {board.source ?? "the AJGA"}. Refreshes every few minutes.
+            </>
+          )}
         </p>
       </div>
 
@@ -184,20 +206,22 @@ export function LiveLeadersCard({
   board,
   timeZone,
   onViewAll,
+  final = false,
 }: {
   board: AjgaLeaderboard;
   timeZone: string;
   onViewAll: () => void;
+  final?: boolean;
 }) {
   const updated = updatedLabel(board.fetchedAt, timeZone);
   return (
     <section aria-labelledby="live-leaders-heading" className="mx-auto w-full max-w-3xl rounded-2xl border border-zinc-200 bg-white px-5 py-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <LivePill />
+          <LivePill final={final} />
           <h2 id="live-leaders-heading" className="font-serif text-xl font-semibold">Leaders</h2>
         </div>
-        {updated ? <p className="text-xs text-zinc-500">Updated {updated}</p> : null}
+        {updated && !final ? <p className="text-xs text-zinc-500">Updated {updated}</p> : null}
       </div>
       <div className={`mt-4 grid gap-4 ${board.divisions.length > 1 ? "sm:grid-cols-2" : ""}`}>
         {board.divisions.map((item) => (
