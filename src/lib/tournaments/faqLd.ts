@@ -51,7 +51,7 @@ export function buildFaqLd(t: {
       acceptedAnswer: {
         "@type": "Answer",
         text:
-          `${champion} won the ${year} ${t.name}${score ? ` (${score})` : ""}.` +
+          `${champion} won the ${year} ${t.name}${score ? ` with ${score}` : ""}.` +
           (runnerUp ? ` ${runnerUp} finished runner-up.` : ""),
       },
     });
