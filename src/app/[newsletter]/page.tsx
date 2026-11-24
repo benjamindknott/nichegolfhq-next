@@ -269,7 +269,7 @@ export default async function NewsletterPage({
                             return (
                               <Link
                                 key={t.slug}
-                                href={`/${feed.slug}/schedule/${t.slug}`}
+                                href={`/${feed.slug}/${t.slug}`}
                                 className="group/evt flex items-center justify-between gap-3 rounded-xl border border-white/10 px-4 py-3.5 transition hover:border-white/20 hover:bg-white/5"
                               >
                                 <div className="min-w-0 flex-1">
@@ -301,7 +301,7 @@ export default async function NewsletterPage({
           ) : scheduleLabel ? (
             <div className="mt-10">
               <Link
-                href={feed.slug === "midamgolfhq" ? "/midamgolfhq/schedule" : feed.slug === "juniorgolfhq" ? "/juniorgolfhq/schedule" : "/seniorgolfhq/schedule"}
+                href={feed.slug === "midamgolfhq" ? "/midamgolfhq/schedule" : feed.slug === "juniorgolfhq" ? "/juniorgolfhq/majors" : "/seniorgolfhq/schedule"}
                 className="inline-flex items-center rounded-full bg-white px-7 py-3.5 text-sm font-bold text-zinc-950 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-white/10"
               >
                 {scheduleLabel}
