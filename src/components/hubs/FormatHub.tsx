@@ -53,7 +53,12 @@ const RESULTS_NOTE: Record<string, string> = {
 };
 
 /** A live board read from the event's scoring page, plus the zone its "updated" stamp is shown in. */
-export type LiveBoard = { board: AjgaLeaderboard; timeZone: string };
+export type LiveBoard = {
+  board: AjgaLeaderboard;
+  timeZone: string;
+  /** The event is over: the board is shown as final results, not live scoring. */
+  final?: boolean;
+};
 
 export function FormatHub({
   tournament,
@@ -72,7 +77,7 @@ export function FormatHub({
   const applicationLinks = (tournament.howToPlay ?? []).filter((entry) => entry.href);
   const tabs: Panel[] = ["Overview", resultsLabel, "Field", "Event", ...(applicationLinks.length ? (["How to play"] as Panel[]) : [])];
   // While an event is live, open on the scoreboard.
-  const [tab, setTab] = useState<Panel>(live ? resultsLabel : "Overview");
+  const [tab, setTab] = useState<Panel>(live && !live.final ? resultsLabel : "Overview");
   // With a live board on the page, live scoring stays on the hub: open the
   // scoreboard tab and bring the tabs into view.
   const showLiveScoring = () => {
@@ -102,7 +107,7 @@ export function FormatHub({
         {place ? <p className="mx-auto mt-2 max-w-2xl text-balance text-base text-zinc-600">{place}</p> : null}
         {dates ? <p className="mt-1 text-base font-semibold text-zinc-900">{dates}</p> : null}
         <div className="mt-3 flex flex-wrap justify-center gap-2">
-          <ScoringAccess tournament={tournament} onShowLive={live ? showLiveScoring : undefined} />
+          <ScoringAccess tournament={tournament} onShowLive={live && !live.final ? showLiveScoring : undefined} />
           {tournament.golfGeniusUrl && tournament.tournamentWebsite ? (
             <a
               href={tournament.tournamentWebsite}
@@ -139,13 +144,13 @@ export function FormatHub({
         <div hidden={tab !== "Overview"}>
           {live ? (
             <div className="mb-8">
-              <LiveLeadersCard board={live.board} timeZone={live.timeZone} onViewAll={() => setTab(resultsLabel)} />
+              <LiveLeadersCard board={live.board} timeZone={live.timeZone} final={live.final} onViewAll={() => setTab(resultsLabel)} />
             </div>
           ) : null}
           <OverviewPanel tournament={tournament} standing={standing} channel={channel} />
         </div>
         <div hidden={tab !== resultsLabel || !live}>
-          {live ? <LiveLeaderboard board={live.board} timeZone={live.timeZone} /> : null}
+          {live ? <LiveLeaderboard board={live.board} timeZone={live.timeZone} final={live.final} /> : null}
         </div>
         <div hidden={tab !== resultsLabel || Boolean(live)}>
           <ResultsPanel
